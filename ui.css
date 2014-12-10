@@ -1,0 +1,56 @@
+#dialogueButton
+{
+	z-index: 100;
+	width:85px;
+	height:46px;
+	position: fixed;
+	left: 8px;
+	top: 46px;
+	background-color: #3917f9;
+}
+
+#downloadMenu
+{
+	z-index: 100;
+	background-image: url("https://a-v2.sndcdn.com/assets/images/header/header-bg-d50908.png");
+	background-repeat: repeat-x;
+	background-size: 100%;
+	position: fixed;
+	left:93px;
+	top:46px;
+	border-radius: 3px;
+}
+
+#downloadMenu .p
+{
+	display: inline-block;
+	margin:2px;
+}
+
+.setting
+{
+	margin:4px;
+	padding:4px;
+	border-radius: 3px;
+	background-color: #f50;
+	background: linear-gradient(#f70,#f30);
+	
+}
+
+#numSelector
+{
+}
+
+#hqCheckbox
+{
+}
+
+#directoryBox
+{
+}
+
+#downloadButton:hover
+{
+	background-color: #f72;
+	background: linear-gradient(#f92,#f62);
+}
