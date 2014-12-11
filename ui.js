@@ -1,3 +1,5 @@
+var download = null;
+
 function startDownload()
 {
 	var number = parseInt(document.getElementById("numSelector").value, 10);
@@ -7,12 +9,19 @@ function startDownload()
 	
 	if( ( user_id = getUserId() ) != 0)
 	{
-		download(user_id, number, target, ignoreStreams);
+		download = new Download(user_id, number, target, ignoreStreams);
+		download.setOnFinished(downloadFinished);
+		download.start();
 	}
 	else
 	{
 		alert("update the extension!");
 	}
+}
+
+function downloadFinished()
+{
+
 }
 
 function getUserId()
@@ -99,7 +108,5 @@ function buildDownloadButton()
 	return div;
 }
 
-
-console.log("Entered Extension");
 downloadMenuActive = false;
 injectUi();
