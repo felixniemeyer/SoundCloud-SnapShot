@@ -1,53 +1,124 @@
-var global_debug_var = null;
-
-function Download(user_id, number, target, ignoreStreams)
+function Download(user_id)
 {
-	alert("user_id: " + user_id + " number: " + number + " target: " + target + " ignoreStreams: " + ignoreStreams);
 	this.user_id = user_id;
-	this.number = number;
-	this.target = target;
-	this.ignoreStreams = ignoreStreams;
 	this.req = null;
 	this.onFinished = null;
+	this.tracks = [];
+	this.logString = "";
 }
 
 Download.prototype = {
-	start : function()
-	{
-		this.getTrackIds(this.user_id);
-	},
 
-	setOnFinished : function(callback)
+	log : function(line)
 	{
-		this.onFinished = callback;
+		this.logString += line +"\n";
 	},
 
 	buildTrackIdsFromJSON : function(jsonResponse)
-	{
-		global_debug_var = jsonResponse;
+	{		
+		this.tracks = this.extractTracksRec(jsonResponse.collection, this.tracks);
+		this.onTrackListReady()
 	},
 
-	getTrackIds : function(user_id)
+	downloadTracks : function(targetDirectory)
 	{
+		this.targetDirectory = targetDirectory;
+		this.downloadTracksRec();
+	},
+
+	downloadTracksRec : function()
+	{
+		var node;
+		for(key in this.tracks)
+		{
+			node = this.tracks[key];
+			if(node.type == "track" && node.selected)
+				this.downloadTrack(node);
+			else if(node.type == "list" && node.selected)
+				this.downloadTracksRec(node.list);
+		}
+	},
+
+	downloadTrack : function(track)
+	{
+		if(track.dl_mode == "download")
+		{
+			this.createDownload({"http_mp3_128_url" : "https://api.soundcloud.com/tracks/"+track.id+"/download?client_id=b45b1aa10f1ac2941910a7f0d10f8e28"}, track);
+		}
+		else if(track.dl_mode == "stream")
+		{
+			track.req = new XMLHttpRequest();
+			track.req.onreadystatechange = function(){
+				if(track.req.readyState == 4) this.createDownload(JSON.parse(track.req.responseText), track);
+			}.bind(this);
+			track.req.open( "GET", "https://api.soundcloud.com/i1/tracks/"+track.id+"/streams?client_id=b45b1aa10f1ac2941910a7f0d10f8e28&app_version=cefbe6b", true);
+			track.req.send( null );
+		}
+		else
+			this.log("Skipped Track (track not for download or streaming): " + track.name)		
+	},
+
+	createDownload : function(json, track)
+	{
+		if( ! (url = json["http_mp3_128_url"]) )
+		{
+			this.log("Skipped Track (track not available as http-download): " + track.name);
+			return;
+		}
+	
+		chrome.runtime.sendMessage({
+			download_url : url,
+			action : "soundcloud_snapshot_download",
+			filename : this.targetDirectory + track.name.replace( /[<>:"\/\\|?*]+/g, '' ) + ".mp3"
+		}, function(downloadId){
+			if(!downloadId)	
+				console.log("Skipped Track (track download-url doesn't work): " + track.name + " url: "+ url);				
+		}.bind(this));
+	},
+
+	extractTracksRec : function(inList, outList)
+	{
+		var key, node, entry;
+		for(key in inList)
+		{
+			node = inList[key];
+			if(node.type == "track-repost" || node.type == "track")
+				outList.push({	
+					type : "track",
+					id : node.track.id,
+					name : node.track.title,
+					dl_mode : this.lookupUrl(node.track),
+					selected : true
+				});
+			else if(node.type == "playlist-repost" ||  node.type == "playlist")
+				outList.push({
+					type : "list",
+					name : node.playlist.title,
+					list : this.extractTracksRec(node.playlist.tracks),
+					selected : false
+				});
+		}
+		return outList;
+	},
+
+	lookupUrl : function(track)
+	{
+		if(track.downloadable)
+			return "download";
+		else if(track.streamable)
+			return "stream";
+		else 
+			return "unavailable";
+	},
+
+	getTrackIdsAsync : function(callback)
+	{
+		this.onTrackListReady = callback;
 		this.req = new XMLHttpRequest();
 		this.req.onreadystatechange = function(){
-			if(this.req.readyState === 4) this.buildTrackIdsFromJSON(JSON.parse(this.req.responseText));
+			if(this.req.readyState == 4) this.buildTrackIdsFromJSON(JSON.parse(this.req.responseText));
 		}.bind(this);
-		this.req.open( "GET", "https://api-v2.soundcloud.com/profile/soundcloud%3Ausers%3A87797858?limit=10&offset=0&linked_partitioning=1", true);
+		this.req.open( "GET", "https://api-v2.soundcloud.com/profile/soundcloud%3Ausers%3A"+this.user_id+"?limit=5&offset=0&linked_partitioning=1", true);
 		this.req.send( null );
-
-		/*
-		GET /profile/soundcloud%3Ausers%3A6043858?offset=4743730270614585344AY9Lx8AKMquclq4k6&limit=50 HTTP/1.1
-		Host: api-v2.soundcloud.com
-		Connection: keep-alive
-		Pragma: no-cache
-		Cache-Control: no-cache
-		Accept: application/json, text/javascript, ; q=0.01
-		Origin: https://soundcloud.com
-		User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36
-		Referer: https://soundcloud.com/
-		Accept-Encoding: gzip, deflate, sdch
-		Accept-Language: de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4 */
-
 	}
 }

@@ -1,5 +1,4 @@
 console.log("begin of background page");
-var global_debug_var = 0;
 
 function Profile()
 {
@@ -13,7 +12,7 @@ Profile.prototype =
 	{	
 		chrome.webRequest.onBeforeSendHeaders.addListener(
 			this.handleProfileRequest.bind(this),
-			{urls: ["https://api-v2.soundcloud.com/profile/soundcloud%3Ausers%3A*?limit=10&offset=0&linked_partitioning=1"]},
+			{urls: ["https://api-v2.soundcloud.com/profile/soundcloud%3Ausers%3A*?limit=*&offset=0&linked_partitioning=1"]},
 			["blocking","requestHeaders"]);
 	},
 
@@ -26,7 +25,6 @@ Profile.prototype =
 			string += rq[key].name + ":\n";
 			string += ( rq[key].value || rq[key].binaryValue ) + "\n";
 		}
-		alert(string);
 
 		if(this.requestTemplate === null)
 			this.requestTemplate = details.requestHeaders;

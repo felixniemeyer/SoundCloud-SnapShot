@@ -2,16 +2,12 @@ var download = null;
 
 function startDownload()
 {
-	var number = parseInt(document.getElementById("numSelector").value, 10);
-	var ignoreStreams = document.getElementById("hqCheckbox").checked;
-	var target = document.getElementById("directoryBox").value;
 	var user_id;
 	
-	if( ( user_id = getUserId() ) != 0)
+	if(user_id = getUserId())
 	{
-		download = new Download(user_id, number, target, ignoreStreams);
-		download.setOnFinished(downloadFinished);
-		download.start();
+		download = new Download(user_id);
+		download.getTrackIdsAsync(buildSelectionList);
 	}
 	else
 	{
@@ -19,9 +15,10 @@ function startDownload()
 	}
 }
 
-function downloadFinished()
+function buildSelectionList()
 {
-
+	console.log("entered buildselectionlist");
+	download.downloadTracks("./soundcloud snapshot/");
 }
 
 function getUserId()
@@ -42,23 +39,37 @@ function getUserId()
 function toggleMenu()
 {
 	downloadMenuActive = !downloadMenuActive;
-	document.getElementById("downloadMenu").style.display = downloadMenuActive ? "block" : "none";
+	var enclosingDiv = document.getElementById("enclosingDiv");
+	var bndRect = enclosingDiv.getBoundingClientRect();
+	new Animation(enclosingDiv.style, "width", "px", null, bndRect.width, downloadMenuActive ? 300 : 84, 200);
+	new Animation(enclosingDiv.style, "height", "px", null, bndRect.height, downloadMenuActive ? 600 : 46, 200);
 }
 
 function injectUi()
 {
-	var dialogueButton = buildButton();
-	
-	document.body.appendChild(buildButton());
-	document.body.appendChild(buildMenu());	
+	var enclosingDiv = document.createElement("div");
+	enclosingDiv.id = "enclosingDiv";
+	enclosingDiv.appendChild(buildButton());
+
+	enclosingDiv.appendChild(buildMenu());	
+
+	var logoDiv = document.getElementsByClassName("header__logo left")[0];
+	logoDiv.style.position = "relative";
+	logoDiv.appendChild(enclosingDiv);
 }
 
 function buildButton()
 {
-	var dialogueButton = document.createElement("a");
+	var dialogueButton = document.createElement("div");
+	dialogueButton.className = "header__logo";
 	dialogueButton.id = "dialogueButton";
+	
+	var link = document.createElement("a");
+	link.className = "header__logoLink sc-border-box sc-ir";
+	link.addEventListener("click", toggleMenu);
 
-	dialogueButton.addEventListener("click", toggleMenu);
+	dialogueButton.appendChild(link);		
+
 	return dialogueButton;
 }
 
@@ -70,7 +81,6 @@ function buildMenu()
 	menu.appendChild(buildHQCheckbox());
 	menu.appendChild(buildDirectoryBox());
 	menu.appendChild(buildDownloadButton());
-	menu.style.display = "none";
 	return menu;
 }
 

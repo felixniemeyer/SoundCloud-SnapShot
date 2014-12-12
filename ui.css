@@ -1,12 +1,24 @@
 #dialogueButton
 {
 	z-index: 100;
-	width:85px;
+	width:84px;
 	height:46px;
-	position: fixed;
-	left: 8px;
+	position: absolute;
+	left:0;
+	top:0;
+	background-color: #f50;
+	background: linear-gradient(#f70,#f30);	
+}
+
+#enclosingDiv
+{
+	background-color: #ff0099;
+	position: absolute;
+	left: 0px;
 	top: 46px;
-	background-color: #3917f9;
+	width: 300px;
+	height: 600px;
+	overflow: hidden;
 }
 
 #downloadMenu
@@ -15,8 +27,8 @@
 	background-image: url("https://a-v2.sndcdn.com/assets/images/header/header-bg-d50908.png");
 	background-repeat: repeat-x;
 	background-size: 100%;
-	position: fixed;
-	left:93px;
+	position: absolute;
+	left:0px;
 	top:46px;
 	border-radius: 3px;
 }
@@ -35,18 +47,6 @@
 	background-color: #f50;
 	background: linear-gradient(#f70,#f30);
 	
-}
-
-#numSelector
-{
-}
-
-#hqCheckbox
-{
-}
-
-#directoryBox
-{
 }
 
 #downloadButton:hover

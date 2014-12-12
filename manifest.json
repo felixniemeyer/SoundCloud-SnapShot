@@ -6,13 +6,13 @@
   "version": "1.0",
 
   "background": {
-    "scripts": ["profile_scan.js"]
+    "scripts": ["profile_scan.js", "download.js"]
   },
 
   "content_scripts": [
     {
       "matches": ["https://soundcloud.com/*"],
-      "js": ["dl.js", "ui.js"],
+      "js": ["dl.js", "ui.js", "animate.js"],
       "css": ["ui.css"],
       "run_at": "document_end"
     }
@@ -26,6 +26,7 @@
   "permissions" : [
     "https://api-v2.soundcloud.com/*",
     "webRequest",
-    "webRequestBlocking"
+    "webRequestBlocking",
+    "downloads"
   ]
 }
