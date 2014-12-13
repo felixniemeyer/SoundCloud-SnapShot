@@ -118,7 +118,7 @@ Download.prototype = {
 		this.req.onreadystatechange = function(){
 			if(this.req.readyState == 4) this.buildTrackIdsFromJSON(JSON.parse(this.req.responseText));
 		}.bind(this);
-		this.req.open( "GET", "https://api-v2.soundcloud.com/profile/soundcloud%3Ausers%3A"+this.user_id+"?limit=5&offset=0&linked_partitioning=1", true);
+		this.req.open( "GET", "https://api-v2.soundcloud.com/profile/soundcloud%3Ausers%3A"+this.user_id+"?limit=50&offset=0&linked_partitioning=1", true);
 		this.req.send( null );
 	}
 }

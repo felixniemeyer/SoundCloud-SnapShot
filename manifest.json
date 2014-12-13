@@ -28,5 +28,9 @@
     "webRequest",
     "webRequestBlocking",
     "downloads"
+  ],
+
+  "web_accessible_resources": [
+    "img/*.png"
   ]
 }

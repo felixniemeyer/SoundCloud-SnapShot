@@ -26,7 +26,7 @@ Profile.prototype =
 			string += ( rq[key].value || rq[key].binaryValue ) + "\n";
 		}
 
-		if(this.requestTemplate === null)
+		if(this.requestTemplate === null) //always when origin is soundcloud.com already! => stay up to date, allow tab switches
 			this.requestTemplate = details.requestHeaders;
 		
 		console.log("header treated");

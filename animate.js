@@ -11,7 +11,7 @@ function update()
 	var i, finishedAnimations = [];
 	for(i = 0; i < animations.length; i++)
 		if(!animations[i].update())
-			finishedAnimations = animations[i];
+			finishedAnimations.push(animations[i]);
 
 	for(i = 0; i < finishedAnimations.length; i++)
 		animations.splice(animations.indexOf(finishedAnimations[i]),1);
@@ -43,9 +43,10 @@ Animation.prototype = {
 		}
 		else if(now > this.start)
 		{
-			var progress = (now-this.start)/(this.end - this.start);
-			progress = Math.sqrt(progress);
+			var x = (now-this.start)/(this.end - this.start);
+			var progress = 1 - Math.pow(x - 1, 2);
 			this.element[this.attributeName] = (this.value0 * (1-progress) + this.value1 * (progress)) + this.unit;
+			return true;
 		}
 	}
 }
