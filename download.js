@@ -8,6 +8,6 @@ function handleDownloadRequest(request, sender, sendResponse)
 			url : request.download_url,
 			filename : request.filename,
 			conflictAction : "overwrite"
-		}, sendResponse)
+		});
 	}
 }

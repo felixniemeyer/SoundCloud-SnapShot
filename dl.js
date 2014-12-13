@@ -33,36 +33,46 @@ Download.prototype = {
 		{
 			node = list[key];
 			if(node.type == "track" && node.selected)
-				this.downloadTrack(node);
+				this.downloadTrack(node, true); //true means force download from stream, loading from official download url causes problems.
 			else if(node.type == "list" && node.selected)
 				this.downloadTracksRec(node.list);
 		}
 	},
 
-	downloadTrack : function(track)
+	downloadTrack : function(track, forceStream)
 	{
-		if(track.dl_mode == "download")
+		var url;
+	
+		if(track.dl_mode == "stream" || forceStream)
 		{
-			this.createDownload({"http_mp3_128_url" : "https://api.soundcloud.com/tracks/"+track.id+"/download?client_id=b45b1aa10f1ac2941910a7f0d10f8e28"}, track);
-		}
-		else if(track.dl_mode == "stream")
-		{
+
+			url = "https://api.soundcloud.com/i1/tracks/"+track.id+"/streams?client_id=b45b1aa10f1ac2941910a7f0d10f8e28&app_version=cefbe6b";
 			track.req = new XMLHttpRequest();
 			track.req.onreadystatechange = function(){
 				if(track.req.readyState == 4) this.createDownload(JSON.parse(track.req.responseText), track);
 			}.bind(this);
-			track.req.open( "GET", "https://api.soundcloud.com/i1/tracks/"+track.id+"/streams?client_id=b45b1aa10f1ac2941910a7f0d10f8e28&app_version=cefbe6b", true);
+
+			track.req.open( "GET", url, true);
 			track.req.send( null );
 		}
+		else if(track.dl_mode == "download")
+			this.createDownload({"hq_download" : "https://api.soundcloud.com/tracks/"+track.id+"/download?client_id=b45b1aa10f1ac2941910a7f0d10f8e28&app_version=cefbe6b"}, track);
 		else
-			this.log("Skipped Track (track not for download or streaming): " + track.name)		
+		{
+			this.log("Skipped Track (track not available for download or streaming): " + track.name);
+			return 0;
+		}
+
+		
 	},
 
 	createDownload : function(json, track)
 	{
-		if( ! (url = json["http_mp3_128_url"]) )
+
+		if( ! (url = json["http_mp3_128_url"] || json["hq_download"]) )
 		{
 			this.log("Skipped Track (track not available as http-download): " + track.name);
+			console.log("Skipped because no http_mp3_123_url available: " + track.name);
 			return;
 		}
 	
@@ -70,9 +80,17 @@ Download.prototype = {
 			download_url : url,
 			action : "soundcloud_snapshot_download",
 			filename : this.targetDirectory + track.name.replace( /[<>:"\/\\|?*]+/g, '' ) + ".mp3"
-		}, function(downloadId){
-			if(!downloadId)	
-				console.log("Skipped Track (track download-url doesn't work): " + track.name + " url: "+ url);				
+		}, function(response){
+			if(!response.downloadId) // not working currently
+			{
+				if(json["hq_download"])
+				{
+					this.downloadTrack(track, true); //fallback on stream download
+					console.log("Trying to download stream instead of broken hq download for track:" + track.name);
+				}
+				else
+					console.log("Skipped Track (track download-url doesn't work): " + track.name + " url: "+ url);	
+			}				
 		}.bind(this));
 	},
 
