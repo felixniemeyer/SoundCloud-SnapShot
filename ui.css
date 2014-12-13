@@ -41,7 +41,7 @@
 	height: 508px;
 	top: 46px;
 	left: 0px;
-	background-color: #333333;
+	background-color: #333;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	color: #ddd;
@@ -50,11 +50,11 @@
 .tracklist__item
 {
 	position: relative;
-	border-top: 1px solid #666;
-	border-radius: 0px;
+	border-top: 1px solid #555;
+	border-radius: 5px;
 	margin: 0px;
 	background-repeat: no-repeat;
-	background-color: #444;
+	background-color: #333;
 	background-position: 0 0;
 	background-size: 23px 23px;
 	height:23px;
@@ -67,22 +67,22 @@
 
 .playlistDiv
 {
-	background-color: #448;
+	background-color: #336;
 	padding: 0px 29px 0px 29px;
 }
 .trackDiv
 {
-	background-color: #444;
+	background-color: #333;
 	padding: 0px 6px 0px 29px;
 }
 
 .playlistDiv:hover
 {
-	background-color: #337;
+	background-color: #225;
 }
 .trackDiv:hover
 {
-	background-color: #333;
+	background-color: #222;
 }
 
 #tracklist::-webkit-scrollbar
@@ -91,7 +91,7 @@
 	height:16px;
 }
 #tracklist::-webkit-scrollbar-button:start:decrement,#tracklist::-webkit-scrollbar-button:end:increment{display:block;height:0;background-color:transparent;}
-#tracklist::-webkit-scrollbar-track-piece{background-color:#444;-webkit-border-radius:0;}
+#tracklist::-webkit-scrollbar-track-piece{background-color:#333;-webkit-border-radius:0;}
 #tracklist::-webkit-scrollbar-thumb:vertical{height:50px;background-color:#999;-webkit-border-radius:8px;}
 #tracklist::-webkit-scrollbar-thumb:horizontal{width:50px;background-color:#999;-webkit-border-radius:8px;}
 
