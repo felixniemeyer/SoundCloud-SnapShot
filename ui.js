@@ -30,6 +30,8 @@ function injectUi()
 	var enclosingDiv = document.createElement("div");
 	enclosingDiv.id = "enclosingDiv";
 	enclosingDiv.appendChild(buildButton());
+	enclosingDiv.appendChild(buildSelectAllButton());
+	enclosingDiv.appendChild(buildSelectNoneButton());
 	enclosingDiv.appendChild(buildDownloadButton());
 	enclosingDiv.appendChild(buildTrackList());	
 	enclosingDiv.expanded = false;
@@ -44,16 +46,58 @@ function injectUi()
 function buildButton()
 {
 	var dialogueButton = document.createElement("div");
-	dialogueButton.className = "header__logo";
+	dialogueButton.className = "scss_button";
 	dialogueButton.id = "dialogueButton";
 	
 	var link = document.createElement("a");
-	link.className = "header__logoLink sc-border-box sc-ir";
+	link.style.backgroundImage = "url('" + chrome.extension.getURL("./img/logo.png") + "')";
 	link.addEventListener("click", toggleMenu);
 
 	dialogueButton.appendChild(link);		
 
 	return dialogueButton;
+}
+
+function buildSelectAllButton()
+{
+	var allDiv = document.createElement("div");
+	allDiv.className = "scss_button"
+	allDiv.style.left = "84px";
+	allDiv.style.top = "0px";
+	allDiv.style.width = (100 - 2) + "px";
+	allDiv.innerText = "Select All";
+	allDiv.addEventListener("click", function(){setAllTracklistItemsSelected(true)}); 
+	return allDiv;
+}
+
+function buildSelectNoneButton()
+{
+	var noneDiv = document.createElement("div");
+	noneDiv.className = "scss_button"
+	noneDiv.style.left = (84 + 100) + "px";
+	noneDiv.style.top = "0px";
+	noneDiv.style.width = ((300-84-100) - 2) + "px";
+	noneDiv.innerText = "Select None";
+	noneDiv.addEventListener("click", function(){setAllTracklistItemsSelected(false)});
+	return noneDiv;
+}
+
+function setAllTracklistItemsSelected(state)
+{
+	var i, items = document.getElementsByClassName("tracklist__item");
+	for(i = 0; i < items.length; i++) 
+		setTrackDivBg(items[i], state);
+	download.clearSelection(state);
+}
+
+function buildDownloadButton()
+{
+	var div = document.createElement("div");
+	div.className = "scss_button";
+	div.id = "downloadButton";
+	div.innerText = "Download!";
+	div.addEventListener("click", startDownload);
+	return div;
 }
 
 function buildTrackList()
@@ -88,39 +132,72 @@ function fillTrackList()
 	for(i = 0; i < tracks.length; i++)
 	{
 		track = tracks[i];
-		if(track.type = "track")
-			addTrackDiv(content, [i], track, 0);
-		else if(track.type = "list")
-		{
-			list = track.list;
-			for(j = 0; j < list.length; j++)
-				addTrackDiv(content, [i, j], track, 40);
-		}
+		if(track.type == "track")
+			content.appendChild(buildTrackDiv(track, [i], 0));
+		else if(track.type == "list")
+			content.appendChild(buildPlaylistDiv(track, i));
 	}
 	//make list with tracks / plalists: each with name (shortened: "..."), checkbox. Checkbox als grafik, onclick: toggleSelection([id1,id2]) => updated event.sender.grafik + tracks[id1].selected
 	//subtracks have bigger left
 }
 
-function addTrackDiv(content, ids, track, left)
+function buildTrackDiv(track, ids, sub)
 {
 	var trackDiv = document.createElement("div");
-	trackDiv.className = "trackDiv";
-	trackDiv.addEventListener("click", function(){toggleSelection(event.target, ids[0], ids[1])});
-	trackDiv.style.marginLeft = left + "px";
-	trackDiv.style.width = (300 - 16 - 6 - 29 - left) + "px";
+	trackDiv.className = "tracklist__item trackDiv";
+	trackDiv.addEventListener("click", function(){toggleSelection(event, ids[0], ids[1])});
+	trackDiv.style.width = (300 - 16 - 6 - 29 - (sub ? 29 : 0)) + "px";
 	trackDiv.innerText = track.name;
 	setTrackDivBg(trackDiv, track.selected);
-	content.appendChild(trackDiv);
+	return trackDiv;
 }
 
-function toggleSelection(trackDiv, trackId, listId)
+function buildPlaylistDiv(playlist, tid)
+{
+	var playlistDiv = document.createElement("div");
+	playlistDiv.className = "tracklist__item playlistDiv";
+	playlistDiv.addEventListener("click", function(){toggleSelection(event, tid)});
+	playlistDiv.style.width = (300 - 16 - 29 - 29) + "px";
+	playlistDiv.expandedHeight = (playlist.list.length + 1) * (23+1) - 1; //23+1 = "width + border"
+	playlistDiv.height = playlistDiv.expandedHeight + "px";
+	playlistDiv.innerText = "(" + playlist.list.length + ")" + playlist.name
+	setTrackDivBg(playlistDiv, playlist.selected);
+	
+	playlistDiv.appendChild(buildExpandButton());
+	for(i = 0; i < playlist.list.length; i++)
+		playlistDiv.appendChild(buildTrackDiv(playlist.list[i], [i, tid], true));
+	return playlistDiv;
+}
+
+function buildExpandButton()
+{
+	var colExp = document.createElement("div");
+	colExp.className = "expandButton";
+	colExp.expanded = false;
+	colExp.style.backgroundImage = "url('" + chrome.extension.getURL("./img/collapsed.png") + "')"
+	colExp.addEventListener("click", togglePlaylistExpansion);
+	return colExp;
+}
+
+function togglePlaylistExpansion()
+{
+	var colExp = event.target
+	colExp.expanded = !colExp.expanded;
+	colExp.style.backgroundImage = "url('" + chrome.extension.getURL(colExp.expanded ? "./img/expanded.png" : "./img/collapsed.png") + "')";
+	var playlistDiv = colExp.parentNode;
+	new Animation(playlistDiv.style, "height", "px", null, playlistDiv.getBoundingClientRect().height, colExp.expanded ? playlistDiv.expandedHeight : 23, 400);
+	event.stopPropagation()
+}
+
+function toggleSelection(event, trackId, listId)
 {
 	var track;
 	if(listId)
 		track = download.tracks[listId].list[trackId];
 	else
 		track = download.tracks[trackId];
-	setTrackDivBg(trackDiv, track.selected = !track.selected);
+	setTrackDivBg(event.target, track.selected = !track.selected);
+	event.stopPropagation();
 }
 
 function setTrackDivBg(trackDiv, selected)
@@ -129,15 +206,6 @@ function setTrackDivBg(trackDiv, selected)
 	trackDiv.style.backgroundImage = "url('" + url + "')";
 }
 
-function buildDownloadButton()
-{
-	var div = document.createElement("div");
-	div.className = "sc-button sc-button-cta";
-	div.id = "downloadButton";
-	div.innerHTML = "Download!";
-	div.addEventListener("click", startDownload);
-	return div;
-}
 
 function startDownload()
 {

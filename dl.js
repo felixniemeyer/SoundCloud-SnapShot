@@ -16,22 +16,22 @@ Download.prototype = {
 
 	buildTrackIdsFromJSON : function(jsonResponse)
 	{		
-		this.tracks = this.extractTracksRec(jsonResponse.collection, this.tracks);
+		this.tracks = this.extractTracksRec(jsonResponse.collection);
 		this.onTrackListReady()
 	},
 
 	downloadTracks : function(targetDirectory)
 	{
 		this.targetDirectory = targetDirectory;
-		this.downloadTracksRec();
+		this.downloadTracksRec(this.tracks);
 	},
 
-	downloadTracksRec : function()
+	downloadTracksRec : function(list)
 	{
 		var node;
-		for(key in this.tracks)
+		for(key in list)
 		{
-			node = this.tracks[key];
+			node = list[key];
 			if(node.type == "track" && node.selected)
 				this.downloadTrack(node);
 			else if(node.type == "list" && node.selected)
@@ -76,25 +76,28 @@ Download.prototype = {
 		}.bind(this));
 	},
 
-	extractTracksRec : function(inList, outList)
+	extractTracksRec : function(inList, isPlaylist)
 	{
-		var key, node, entry;
+		var key, node, track, entry, outList = [];
 		for(key in inList)
 		{
 			node = inList[key];
-			if(node.type == "track-repost" || node.type == "track")
+			if(node.type == "track-repost" || node.type == "track" || isPlaylist)
+			{
+				track = isPlaylist ? node : node.track;
 				outList.push({	
 					type : "track",
-					id : node.track.id,
-					name : node.track.title,
-					dl_mode : this.lookupUrl(node.track),
+					id : track.id,
+					name : track.title,
+					dl_mode : this.lookupUrl(track),
 					selected : true
 				});
+			}
 			else if(node.type == "playlist-repost" ||  node.type == "playlist")
 				outList.push({
 					type : "list",
 					name : node.playlist.title,
-					list : this.extractTracksRec(node.playlist.tracks),
+					list : this.extractTracksRec(node.playlist.tracks, true),
 					selected : false
 				});
 		}
@@ -120,5 +123,21 @@ Download.prototype = {
 		}.bind(this);
 		this.req.open( "GET", "https://api-v2.soundcloud.com/profile/soundcloud%3Ausers%3A"+this.user_id+"?limit=50&offset=0&linked_partitioning=1", true);
 		this.req.send( null );
+	},
+
+	clearSelection : function(state)
+	{
+		this.clearSelectionRec(this.tracks, state);
+	},
+
+	clearSelectionRec : function(list, state)
+	{
+		var i;
+		for(i = 0; i < list.length; i++)
+		{
+			list[i].selected = state;
+			if(list[i].type == "list")
+				this.clearSelectionRec(list[i].list, state);
+		}
 	}
 }

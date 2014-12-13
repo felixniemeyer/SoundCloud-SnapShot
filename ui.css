@@ -7,18 +7,31 @@
 	width: 300px;
 	height: 600px;
 	overflow: hidden;
+	box-shadow: 5px 10px 20px rgba(50,50,50,0.8);
+	border-radius: 5px;
+	opacity: 0.7;
+}
+
+#enclosingDiv:hover
+{
+	opacity: 0.95;
 }
 
 #dialogueButton
 {
 	z-index: 100;
-	width:84px;
-	height:46px;
+	width:82px;
+	height:44px;
 	position: absolute;
 	left:0;
 	top:0;
-	background-color: #f50;
-	background: linear-gradient(#f70,#f30);	
+}
+
+#dialogueButton a
+{
+	display: block;
+	width:82px;
+	height:44px;
 }
 
 #tracklist
@@ -31,18 +44,19 @@
 	background-color: #333333;
 	overflow-y: scroll;
 	overflow-x: hidden;
+	color: #ddd;
 }
 
-.trackDiv
+.tracklist__item
 {
+	position: relative;
 	border-top: 1px solid #666;
-	border-radius: 3px;
+	border-radius: 0px;
 	margin: 0px;
 	background-repeat: no-repeat;
 	background-color: #444;
 	background-position: 0 0;
 	background-size: 23px 23px;
-	padding: 0px 6px 0px 29px;
 	height:23px;
 	line-height:23px;
 	font-size: 12px;
@@ -51,9 +65,24 @@
 	text-overflow: ellipsis;
 }
 
+.playlistDiv
+{
+	background-color: #448;
+	padding: 0px 29px 0px 29px;
+}
+.trackDiv
+{
+	background-color: #444;
+	padding: 0px 6px 0px 29px;
+}
+
+.playlistDiv:hover
+{
+	background-color: #337;
+}
 .trackDiv:hover
 {
-	background-color: #5f5f5f;
+	background-color: #333;
 }
 
 #tracklist::-webkit-scrollbar
@@ -62,22 +91,47 @@
 	height:16px;
 }
 #tracklist::-webkit-scrollbar-button:start:decrement,#tracklist::-webkit-scrollbar-button:end:increment{display:block;height:0;background-color:transparent;}
-#tracklist::-webkit-scrollbar-track-piece{background-color:#FAFAFA;-webkit-border-radius:0;-webkit-border-bottom-left-radius:8px;-webkit-border-top-left-radius:8px;}
+#tracklist::-webkit-scrollbar-track-piece{background-color:#444;-webkit-border-radius:0;}
 #tracklist::-webkit-scrollbar-thumb:vertical{height:50px;background-color:#999;-webkit-border-radius:8px;}
 #tracklist::-webkit-scrollbar-thumb:horizontal{width:50px;background-color:#999;-webkit-border-radius:8px;}
 
-#downloadButton
+.expandButton
 {
 	position: absolute;
-	left:0px;
-	width:300px;
-	height:46px;
-	top:554px;
-	line-height: 46px;
-	font-size: 18px;
+	width : 23px;
+	height: 23px;
+	background-color: rgba(255,255,255,0.1);
+	background-size: 24px 24px;
+	right: 0px;
+	top: 0px;
+	cursor: pointer;
 }
 
-#downloadButton:hover
-{	
-	background-color: #f30;
+.scss_button
+{
+	line-height: 44px;
+	font-size: 18px;
+	text-align: center;
+	background-color: rgb(255,72,0);
+	background-image: linear-gradient(#f70,#f30);	
+	height:44px;
+	color: #fff;
+	text-shadow: 0 1px 0 #000;
+	position: absolute;
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgba(173,73,0,.7)rgba(255,255,255,.15)#ad4900;
+	cursor: pointer;
+}
+
+.scss_button:hover
+{
+	background-image: none;
+}
+
+#downloadButton
+{
+	left:0px;
+	width:300px;
+	top:554px;
 }
