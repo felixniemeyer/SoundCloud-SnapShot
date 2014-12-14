@@ -1,28 +1,25 @@
 var download = null;
 
+chrome.runtime.onMessage.addListener(
+	function(request, sender, sendResponse){
+		if(request.event == "user_id_change")
+			userIdChanged(request.newUserId);
+	});
+
+function userIdChanged(userId)
+{
+	resetTracklist();
+	download = new Download(userId);
+	download.getTrackIdsAsync(fillTrackList);
+}
+
 function toggleMenu()
 {
-	var tracklist = document.getElementById("tracklist");
-	if( tracklist.undloaded ) 
-	{
-		tracklist.undloaded = false;
-		loadTrackList();
-	}
 	var enclosingDiv = document.getElementById("enclosingDiv");
 	var bndRect = enclosingDiv.getBoundingClientRect();
 	enclosingDiv.expanded = !enclosingDiv.expanded;
 	new Animation(enclosingDiv.style, "width", "px", null, bndRect.width, enclosingDiv.expanded ? 300 : 84, 400);
 	new Animation(enclosingDiv.style, "height", "px", null, bndRect.height, enclosingDiv.expanded ? 600 : 46, 400);
-}
-
-function loadTrackList()
-{
-	var user_id;
-	if(user_id = getUserId())
-	{
-		download = new Download(user_id);
-		download.getTrackIdsAsync(fillTrackList);
-	}
 }
 
 function injectUi()
@@ -100,45 +97,36 @@ function buildDownloadButton()
 	return div;
 }
 
+function resetTracklist()
+{
+	var tracklist;
+	if( tracklist = document.getElementById("tracklist") )
+		tracklist.parentNode.removeChild(tracklist);
+	document.getElementById("enclosingDiv").appendChild(buildTrackList());
+}
+
 function buildTrackList()
 {
 	var div = document.createElement("div");
 	div.id = "tracklist";
-	div.undloaded = true;
-	// init with loading image
+	div.style.backgroundImage = "url('https://a-v2.sndcdn.com/assets/images/loader-dark-45940ae3.gif')";
 	return div;
-}
-
-function getUserId()
-{
-	var metas = document.getElementsByTagName("meta");
-	var content, user_id;
-	for(var i = 0; i < metas.length; i++)
-	{
-		if( ( content = metas[i].getAttribute("content") ) && content.substr(0,19) === "soundcloud://users:" )
-		{
-			user_id = content.substr(19);
-			break;
-		}
-	}
-	return user_id;
 }
 
 function fillTrackList()
 {
 	var i, k, track, list;
 	var tracks = download.tracks;
-	var content = document.getElementById("tracklist");
+	var tracklist = document.getElementById("tracklist");
+	tracklist.style.backgroundImage = "none";
 	for(i = 0; i < tracks.length; i++)
 	{
 		track = tracks[i];
 		if(track.type == "track")
-			content.appendChild(buildTrackDiv(track, [i], 0));
+			tracklist.appendChild(buildTrackDiv(track, [i], 0));
 		else if(track.type == "list")
-			content.appendChild(buildPlaylistDiv(track, i));
+			tracklist.appendChild(buildPlaylistDiv(track, i));
 	}
-	//make list with tracks / plalists: each with name (shortened: "..."), checkbox. Checkbox als grafik, onclick: toggleSelection([id1,id2]) => updated event.sender.grafik + tracks[id1].selected
-	//subtracks have bigger left
 }
 
 function buildTrackDiv(track, ids, sub)

@@ -48,6 +48,10 @@ Animation.prototype = {
 			this.element[this.attributeName] = (this.value0 * (1-progress) + this.value1 * (progress)) + this.unit;
 			return true;
 		}
+		else
+		{ 
+			return true;
+		}
 	}
 }
 

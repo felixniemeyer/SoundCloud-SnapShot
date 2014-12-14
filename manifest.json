@@ -27,7 +27,8 @@
     "https://api-v2.soundcloud.com/*",
     "webRequest",
     "webRequestBlocking",
-    "downloads"
+    "downloads",
+    "tabs"
   ],
 
   "web_accessible_resources": [

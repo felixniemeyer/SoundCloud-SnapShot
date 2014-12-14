@@ -1,0 +1,40 @@
+todo
+
+Requirement: 1. User study promising
+- Create developer Account on Google
+
+- Distribute to christopher. Make serious user study
+
+- Make serious user study with Jörg
+
+- Don't retry download when aborted by user
+
+- Fix bug: no content when page loads first in background. Tracklist should also be maintained when track loads in background
+
+Done - Reload on further user_id changed messages
+
+Done - Make button first visible when receiving user_id changed message.  
+Feedback: loading icon when no content available yet
+
+Done - Make background page maintain active user_id (profile) per tab. Inform tab when tabs user_id changed.
+Reason: multiple open tabs. Switch profiles in tab.
+Feedback: was hard: page changes don't necessarily lead to reloading of user profile data. -> Maintain a list with urls mapped to user_ids and look for url changes. 
+
+Done - Make download queue @ background page: schedule fifo. re-enqueue on error. maintain progress to be queried by task 
+
+
+#13.12.2014
+
+Done - test if 100 downloads are even possible 
+Feedback: server denies when theres too much traffic. 
+Solution: Make download stack @ background page. Download one track after another. 
+
+Done - visually distinguish playlists from tracks in ui
+
+Done - make playlists expandable und collapsable via button
+
+Done - put tracks in playlist div
+
+Done - distinguish more between plalists and tracks in gui
+
+Done - make some graphics design

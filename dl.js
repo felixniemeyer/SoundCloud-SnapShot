@@ -23,8 +23,8 @@ Download.prototype = {
 	downloadTracks : function(targetDirectory)
 	{
 		this.targetDirectory = targetDirectory;
-		this.downloadTracksSlow(0);
-//		this.downloadTracksRec(this.tracks);
+//		this.downloadTracksSlow(0);
+		this.downloadTracksRec(this.tracks);
 	},
 
 	downloadTracksRec : function(list)
@@ -40,57 +40,12 @@ Download.prototype = {
 		}
 	},
 
-	downloadTracksSlow : function(i, j)
-	{
-		var track, list = this.tracks;
-		if(list[i])
-		{
-			if ( ! list[i].selected )
-			{
-				i++;
-			}
-			else
-			{
-				var inSublist = (list[i].type == "list");
-				if( inSublist )
-				{
-					if(j === undefined) //entered a new sublist
-					{
-						j = 0;
-					}
-					else
-					{
-						if(j < list[i].list.length)
-						{
-							this.downloadTrack(list[i].list[j], true);
-							j++;
-						}
-						else //leave subset
-						{
-							i++;
-							j = undefined;
-						}
-					}
-				}
-				else
-				{
-					this.downloadTrack(list[i], true);
-					i++;
-				}
-			}
-			setTimeout(function(){
-				this.downloadTracksSlow(i, j);
-			}.bind(this), 20*1000);
-		}
-	},
-
 	downloadTrack : function(track, forceStream)
 	{
 		var url;
 	
 		if(track.dl_mode == "stream" || forceStream)
 		{
-
 			url = "https://api.soundcloud.com/i1/tracks/"+track.id+"/streams?client_id=b45b1aa10f1ac2941910a7f0d10f8e28&app_version=cefbe6b";
 			track.req = new XMLHttpRequest();
 			track.req.onreadystatechange = function(){
@@ -106,9 +61,7 @@ Download.prototype = {
 		{
 			this.log("Skipped Track (track not available for download or streaming): " + track.name);
 			return 0;
-		}
-
-		
+		}		
 	},
 
 	createDownload : function(json, track)
@@ -185,6 +138,7 @@ Download.prototype = {
 			if(this.req.readyState == 4) this.buildTrackIdsFromJSON(JSON.parse(this.req.responseText));
 		}.bind(this);
 		this.req.open( "GET", "https://api-v2.soundcloud.com/profile/soundcloud%3Ausers%3A"+this.user_id+"?limit=50&offset=0&linked_partitioning=1", true);
+		this.req.setRequestHeader("scss_sent_from", "cs");
 		this.req.send( null );
 	},
 

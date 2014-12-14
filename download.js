@@ -1,8 +1,12 @@
 var log = "";
 var queue = [];
+var queueFinished = true;
+var delayOnError = 500;
+
+var progress = {};
 
 chrome.runtime.onMessage.addListener(handleDownloadRequest);
-chrome.downloads.onChanged(handleDownloadStateChange);
+chrome.downloads.onChanged.addListener(handleDownloadStateChange);
 
 function handleDownloadRequest(request, sender, sendResponse)
 {
@@ -16,17 +20,25 @@ function handleDownloadStateChange(delta)
 	{
 		if(delta.error)
 		{
-			log += "error while downloading " + download.filename + "\n";
-			if(activeDownload.attemp < 2)
+			log += "error while downloading " + activeDownload.filename;
+			if(activeDownload.attemp < 3)
 			{
-				log += "\t retrying(" + activeDownload.attemp + ") to download" + dowload.filename + "\n";
+				log += " -> retrying (" + activeDownload.attemp + ")\n";
 				queue.push(activeDownload);
 			}
-			workOffQueue();
+			else
+			{
+				log += " -> finally failed\n";
+				addProgress(0,1,0);
+			}
+			setTimeout(function delayDownload(){ workOffQueue(); }, delayOnError);
+			delayOnError *= 2; //Making wait longer and longer on continious error: calm server
 		}
-		if(delta.endTime)
+		else if(delta.endTime)
 		{
-			log += delta.endTime": finished " + download.filename + "\n";
+			delayOnError = 500; //reset delay on error when successfull download
+			log += delta.endTime.current + ": finished " + download.filename + "\n";
+			addProgress(0,0,1);
 			workOffQueue();
 		}
 	}
@@ -35,12 +47,14 @@ function handleDownloadStateChange(delta)
 function addToDownloadQueue(download)
 {
 	queue.push(download);
-	if(queueFinished)
+	if(queueFinished) //only push download to queue or start processing queue?
 	{
 		log = "";
+		resetProgress();
 		queueFinished = false;
 		workOffQueue();
 	}
+	addProgress(1,0,0);
 }
 
 function workOffQueue()
@@ -62,6 +76,7 @@ function workOffQueue()
 			else
 			{
 				log += "Can't create download for " + download.filename + "\n";
+				addProgress(0,1,0);
 				workOffQueue();
 			}
 		});
@@ -75,7 +90,29 @@ function workOffQueue()
 
 function finished()
 {
-	//send log to tabs
+	console.log("Displaying log: " + log);
+	console.log("Stats: " + progress.failed + " failed, " + progress.succeeded + " succeeded. " + progress.total + " total");
+}
+
+function addProgress(total, failed, succeeded)
+{
+	progress.total 		+= total;
+	progress.failed 	+= failed;
+	progress.succeeded 	+= succeeded;
+	broadcastProgress();
+}
+
+function resetProgress()
+{
+	progress.total = 0;
+	progress.failed = 0;
+	progress.succeeded = 0;
+	broadcastProgress();
+}
+
+function broadcastProgress()
+{
+	//to be implemented
 }
 
 function TrackDownload(filename, url)
