@@ -23,7 +23,8 @@ Download.prototype = {
 	downloadTracks : function(targetDirectory)
 	{
 		this.targetDirectory = targetDirectory;
-		this.downloadTracksRec(this.tracks);
+		this.downloadTracksSlow(0);
+//		this.downloadTracksRec(this.tracks);
 	},
 
 	downloadTracksRec : function(list)
@@ -36,6 +37,50 @@ Download.prototype = {
 				this.downloadTrack(node, true); //true means force download from stream, loading from official download url causes problems.
 			else if(node.type == "list" && node.selected)
 				this.downloadTracksRec(node.list);
+		}
+	},
+
+	downloadTracksSlow : function(i, j)
+	{
+		var track, list = this.tracks;
+		if(list[i])
+		{
+			if ( ! list[i].selected )
+			{
+				i++;
+			}
+			else
+			{
+				var inSublist = (list[i].type == "list");
+				if( inSublist )
+				{
+					if(j === undefined) //entered a new sublist
+					{
+						j = 0;
+					}
+					else
+					{
+						if(j < list[i].list.length)
+						{
+							this.downloadTrack(list[i].list[j], true);
+							j++;
+						}
+						else //leave subset
+						{
+							i++;
+							j = undefined;
+						}
+					}
+				}
+				else
+				{
+					this.downloadTrack(list[i], true);
+					i++;
+				}
+			}
+			setTimeout(function(){
+				this.downloadTracksSlow(i, j);
+			}.bind(this), 20*1000);
 		}
 	},
 
