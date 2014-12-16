@@ -1,15 +1,40 @@
-todo
+﻿todo
 
-Requirement: 1. User study promising
+Requirement: User study promising
+Requirement: 200 Tracks successfull
 - Create developer Account on Google
 
 - Distribute to christopher. Make serious user study
 
-- Make serious user study with Jörg
+- Make Playlists expanded initially
+
+- Remove failed downloads from download list. 
+
+- Immediatly trigger next download when dl started successfully. Delay only on error
+
+- Download Progress Bar
+
+- Feedback on "Download": show progress bar, 
+
+- Information tracks, mb, duration @ download button
 
 - Don't retry download when aborted by user
 
+- Move download link requesting to backgroundpage to queue
+
+- Fix bug: no button when logged in
+
 - Fix bug: no content when page loads first in background. Tracklist should also be maintained when track loads in background
+
+- Choose download folder
+
+- Make 50px less height
+
+#15.12.2014
+
+Done - Make serious user study with Jörg
+
+#14.12.2014
 
 Done - Reload on further user_id changed messages
 
