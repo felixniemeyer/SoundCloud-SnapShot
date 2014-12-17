@@ -27,7 +27,7 @@ Profile.prototype =
 		chrome.tabs.onRemoved.addListener(function(tabId, info){
 			if(tabId in this.tabs)
 				delete this.tabs[tabId];
-		})
+		}.bind(this));
 	},
 
 	handleUrlChange : function(tabId, newUrl)

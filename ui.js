@@ -4,7 +4,18 @@ chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse){
 		if(request.event == "user_id_change")
 			userIdChanged(request.newUserId);
+		if(request.event == "progress_change")
+			progressUpdate(request.progress);
 	});
+
+function progressUpdate(progress)
+{
+	var content = document.getElementById("tracklist");
+	var progressHTML = "";
+	for(var user in progress)
+		progressHTML += user + ": " + (progress[user].succeeded + progress[user].failed) / progress[user].total + "<br />";
+	content.innerHTML = progressHTML;
+}
 
 function userIdChanged(userId)
 {
@@ -197,7 +208,7 @@ function setTrackDivBg(trackDiv, selected)
 
 function startDownload()
 {
-	download.downloadTracks("./SoundCloudSnapShot/");
+	download.downloadTracks("SoundCloudSnapShot/");
 }
 
 injectUi();

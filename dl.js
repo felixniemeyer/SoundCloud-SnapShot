@@ -23,7 +23,6 @@ Download.prototype = {
 	downloadTracks : function(targetDirectory)
 	{
 		this.targetDirectory = targetDirectory;
-//		this.downloadTracksSlow(0);
 		this.downloadTracksRec(this.tracks);
 	},
 
@@ -38,58 +37,17 @@ Download.prototype = {
 			else if(node.type == "list" && node.selected)
 				this.downloadTracksRec(node.list);
 		}
+		chrome.runtime.sendMessage({action : "scss_start_download"});
 	},
 
-	downloadTrack : function(track, forceStream)
+	downloadTrack : function(track)
 	{
-		var url;
-	
-		if(track.dl_mode == "stream" || forceStream)
-		{
-			url = "https://api.soundcloud.com/i1/tracks/"+track.id+"/streams?client_id=b45b1aa10f1ac2941910a7f0d10f8e28&app_version=cefbe6b";
-			track.req = new XMLHttpRequest();
-			track.req.onreadystatechange = function(){
-				if(track.req.readyState == 4) this.createDownload(JSON.parse(track.req.responseText), track);
-			}.bind(this);
-
-			track.req.open( "GET", url, true);
-			track.req.send( null );
-		}
-		else if(track.dl_mode == "download")
-			this.createDownload({"hq_download" : "https://api.soundcloud.com/tracks/"+track.id+"/download?client_id=b45b1aa10f1ac2941910a7f0d10f8e28&app_version=cefbe6b"}, track);
-		else
-		{
-			this.log("Skipped Track (track not available for download or streaming): " + track.name);
-			return 0;
-		}		
-	},
-
-	createDownload : function(json, track)
-	{
-
-		if( ! (url = json["http_mp3_128_url"] || json["hq_download"]) )
-		{
-			this.log("Skipped Track (track not available as http-download): " + track.name);
-			console.log("Skipped because no http_mp3_123_url available: " + track.name);
-			return;
-		}
-	
 		chrome.runtime.sendMessage({
-			download_url : url,
-			action : "soundcloud_snapshot_download",
-			filename : this.targetDirectory + track.name.replace( /[<>:"\/\\|?*]+/g, '' ) + ".mp3"
-		}, function(response){
-			if(!response.downloadId) // not working currently
-			{
-				if(json["hq_download"])
-				{
-					this.downloadTrack(track, true); //fallback on stream download
-					console.log("Trying to download stream instead of broken hq download for track:" + track.name);
-				}
-				else
-					console.log("Skipped Track (track download-url doesn't work): " + track.name + " url: "+ url);	
-			}				
-		}.bind(this));
+			action : "scss_track_download",
+			trackId : track.id,
+			trackTitle : track.name,
+			dlDirectory : this.targetDirectory
+		})
 	},
 
 	extractTracksRec : function(inList, isPlaylist)
@@ -105,7 +63,7 @@ Download.prototype = {
 					type : "track",
 					id : track.id,
 					name : track.title,
-					dl_mode : this.lookupUrl(track),
+					dl_mode : this.getDlMode(track),
 					selected : true
 				});
 			}
@@ -120,7 +78,7 @@ Download.prototype = {
 		return outList;
 	},
 
-	lookupUrl : function(track)
+	getDlMode : function(track)
 	{
 		if(track.downloadable)
 			return "download";
