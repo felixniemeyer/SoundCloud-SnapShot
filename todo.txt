@@ -17,6 +17,8 @@ Requirement: 200 Tracks successfull. Tested Successfully on 17.12.2014
 
 )
 
+- also load for featured profiles
+
 - Choose download folder : button opens input file displaying: "Downloads/ _________". initial value "SoundCloud SnapShot" Save on Enter Key / Set Button
 
 - Download Progress Bar: per profile: 2 lines: 1. line "lockerflocker", 2. line "4/20 (3 Errors)". Blue Style, background-width = progress
@@ -25,7 +27,7 @@ Requirement: 200 Tracks successfull. Tested Successfully on 17.12.2014
 
 - Fix bug: no button when logged in -> position absolute
 
-- Make 50px less height
+Done - Make 50px less height
 
 #16.12.2014
 Done - Immediatly trigger next download when dl started successfully. Delay only on error. 
