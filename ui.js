@@ -1,4 +1,5 @@
 var download = null;
+var progresses = {};
 
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse){
@@ -10,11 +11,20 @@ chrome.runtime.onMessage.addListener(
 
 function progressUpdate(progress)
 {
-	var content = document.getElementById("tracklist");
-	var progressHTML = "";
-	for(var user in progress)
-		progressHTML += user + ": " + (progress[user].succeeded + progress[user].failed) / progress[user].total + "<br />";
-	content.innerHTML = progressHTML;
+	var container = document.getElementById("progressContainer");
+	container.getElementsByClassName("progress");
+	for(var profile in progress)
+	{
+		if(! progresses[profile])
+		{
+			progresses[profile] = document.createElement("div");
+			progresses[profile].className = "progress";
+			progresses[profile].style.backgroundSize = "0 0";
+			container.appendChild(progresses[profile]);
+		}
+		progresses[profile].style.backgroundSize = 100* ((progress[profile].succeeded + progress[profile].failed) / progress[profile].total) + "% 100%";
+		progresses[profile].innerHTML = profile + ": " + progress[profile].succeeded + " / " + progress[profile].total + " (" + progress[profile].failed + " errors)";
+	}
 }
 
 function userIdChanged(userId)
@@ -30,7 +40,8 @@ function toggleMenu()
 	var bndRect = enclosingDiv.getBoundingClientRect();
 	enclosingDiv.expanded = !enclosingDiv.expanded;
 	new Animation(enclosingDiv.style, "width", "px", null, bndRect.width, enclosingDiv.expanded ? 300 : 84, 400);
-	new Animation(enclosingDiv.style, "height", "px", null, bndRect.height, enclosingDiv.expanded ? 600 : 46, 400);
+	new Animation(enclosingDiv.style, "height", "px", null, bndRect.height, enclosingDiv.expanded ? 550 : 46, 400);
+	new Animation(document.getElementById("progressContainer").style, "width", "px", null, enclosingDiv.expanded ? 0 : 300, enclosingDiv.expanded ? 300 : 0, 400);
 }
 
 function injectUi()
@@ -45,10 +56,11 @@ function injectUi()
 	enclosingDiv.expanded = false;
 	enclosingDiv.style.width = "84px";
 	enclosingDiv.style.height = "46px";
-
-	var logoDiv = document.getElementsByClassName("header__logo left")[0];
-	logoDiv.style.position = "relative";
-	logoDiv.appendChild(enclosingDiv);
+	document.body.appendChild(enclosingDiv);
+	var progressContainer = document.createElement("div");
+	progressContainer.id = "progressContainer";
+	progressContainer.className = "scrollable";
+	document.body.appendChild(progressContainer);
 }
 
 function buildButton()
@@ -120,6 +132,7 @@ function buildTrackList()
 {
 	var div = document.createElement("div");
 	div.id = "tracklist";
+	div.className = "scrollable"
 	div.style.backgroundImage = "url('https://a-v2.sndcdn.com/assets/images/loader-dark-45940ae3.gif')";
 	return div;
 }

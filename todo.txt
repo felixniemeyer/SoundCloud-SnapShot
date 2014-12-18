@@ -1,34 +1,42 @@
-﻿todo
+todo
 
 Requirement: User study promising
-Requirement: 200 Tracks successfull
+Requirement: 200 Tracks successfull. Tested Successfully on 17.12.2014
 - Create developer Account on Google
 
 - Distribute to christopher. Make serious user study
 
-- Make Playlists expanded initially
+
+(
 
 - Remove failed downloads from download list. 
-
-- Immediatly trigger next download when dl started successfully. Delay only on error
-
-- Download Progress Bar
-
-- Feedback on "Download": show progress bar, 
 
 - Information tracks, mb, duration @ download button
 
 - Don't retry download when aborted by user
 
-- Move download link requesting to backgroundpage to queue
+)
 
-- Fix bug: no button when logged in
+- Choose download folder : button opens input file displaying: "Downloads/ _________". initial value "SoundCloud SnapShot" Save on Enter Key / Set Button
 
-- Fix bug: no content when page loads first in background. Tracklist should also be maintained when track loads in background
+- Download Progress Bar: per profile: 2 lines: 1. line "lockerflocker", 2. line "4/20 (3 Errors)". Blue Style, background-width = progress
 
-- Choose download folder
+- Make Playlists expanded initially
+
+- Fix bug: no button when logged in -> position absolute
 
 - Make 50px less height
+
+#16.12.2014
+Done - Immediatly trigger next download when dl started successfully. Delay only on error. 
+Feedback: found nice solution for this hard problem
+
+Done - Feedback on "Download": show progress bar, 
+
+Done - Move download link requesting to backgroundpage to queue
+
+closed - Fix bug: no content when page loads first in background. Tracklist should also be maintained when track loads in background
+Feedback: couldn't reproduce
 
 #15.12.2014
 

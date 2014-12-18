@@ -1,7 +1,7 @@
 var log = "";
 var queue = [];
 var queueFinished = true;
-var delayOnError = 10000
+var delayOnError = 20000
 var delayBeforeNextDownload = 0;
 
 var activeDownloads = {};
@@ -70,8 +70,15 @@ function startDownload(download)
 					failDownload("failed to get file URL for track", download, true);
 			}
 		};
-		download.urlReq.open( "GET", url, true);
-		download.urlReq.send( null );
+		try
+		{
+			download.urlReq.open( "GET", url, true);
+			download.urlReq.send( null );
+		}
+		catch(e)
+		{
+			failDownload("failed due to network problems", download, true);
+		}
 	}
 }
 
