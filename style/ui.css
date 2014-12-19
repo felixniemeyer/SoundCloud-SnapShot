@@ -19,11 +19,13 @@
 	position: fixed;
 	left:315px;
 	top:60px;
-	width:300px;
+	width:0px;
+	background-color: rgba(100,100,100,0.3);
+	border-radius: 5px; 
 	height:550px;
 	opacity: 0.95;
 	overflow-x:hidden;
-	overflow-y:auto;
+	overflow-y:scroll;
 }
 
 .progress
