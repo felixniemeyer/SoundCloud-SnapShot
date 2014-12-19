@@ -24,12 +24,9 @@ Profile.prototype =
 			}
 		}.bind(this));
 
-		chrome.tabs.onCreated.addListener(function(tabId, change, tab){
-			if(tab.url.indexOf("https://soundcloud.com/") != -1)
-			{
-				if( ! (this.tabs[tabId] && this.tabs[tabId].currentUrl == tab.url) ) 
-					this.handleUrlChange(tabId, tab.url);
-			}
+		chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+			if(request.action = "scss_trigger_user_id_broadcast")
+				this.broadcastUserIdChanged(sender.tab.id, this.tabs[sender.tab.id].userId);
 		}.bind(this));
 
 		chrome.tabs.onRemoved.addListener(function(tabId, info){

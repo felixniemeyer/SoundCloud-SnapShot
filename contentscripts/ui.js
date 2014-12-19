@@ -225,3 +225,4 @@ function startDownload()
 }
 
 injectUi();
+chrome.runtime.sendMessage({action : "scss_trigger_user_id_broadcast"});
