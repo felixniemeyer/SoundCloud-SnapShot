@@ -60,6 +60,7 @@ function injectUi()
 	var progressContainer = document.createElement("div");
 	progressContainer.id = "progressContainer";
 	progressContainer.className = "scrollable";
+	progressContainer.innerText = "Download Progress";
 	document.body.appendChild(progressContainer);
 }
 

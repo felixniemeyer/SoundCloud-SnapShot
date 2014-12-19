@@ -25,7 +25,7 @@ Profile.prototype =
 		}.bind(this));
 
 		chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-			if(request.action = "scss_trigger_user_id_broadcast")
+			if(request.action == "scss_trigger_user_id_broadcast")
 				this.broadcastUserIdChanged(sender.tab.id, this.tabs[sender.tab.id].userId);
 		}.bind(this));
 
