@@ -24,6 +24,14 @@ Profile.prototype =
 			}
 		}.bind(this));
 
+		chrome.tabs.onCreated.addListener(function(tabId, change, tab){
+			if(tab.url.indexOf("https://soundcloud.com/") != -1)
+			{
+				if( ! (this.tabs[tabId] && this.tabs[tabId].currentUrl == tab.url) ) 
+					this.handleUrlChange(tabId, tab.url);
+			}
+		}.bind(this));
+
 		chrome.tabs.onRemoved.addListener(function(tabId, info){
 			if(tabId in this.tabs)
 				delete this.tabs[tabId];
