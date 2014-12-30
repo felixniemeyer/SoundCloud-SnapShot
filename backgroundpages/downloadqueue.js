@@ -1,7 +1,7 @@
 var log = "";
 var queue = [];
 var queueFinished = true;
-var delayOnError = 20000
+var delayOnError = 10000
 var delayBeforeNextDownload = 0;
 
 var activeDownloads = {};
@@ -48,7 +48,8 @@ function failDownload(message, download, retry)
 		log += " -> finally failed\n";
 		addProgress(download, 0, 1, 0);
 	}
-	delayBeforeNextDownload += delayOnError;
+	if(retry)
+		delayBeforeNextDownload += delayOnError;
 	workOffQueue();
 }
 
@@ -59,7 +60,8 @@ function startDownload(download)
 	var forceStream = true;
 	if(download.dlMode == "stream" || forceStream)
 	{
-		url = "https://api.soundcloud.com/i1/tracks/" + download.trackId + "/streams?client_id=b45b1aa10f1ac2941910a7f0d10f8e28&app_version=cefbe6b";
+		
+		url = "https://api.soundcloud.com/i1/tracks/" + download.trackId + "/streams?client_id=a3e059563d7fd3372b49b37f00a00bcf";
 		download.urlReq = new XMLHttpRequest();
 		download.urlReq.onreadystatechange = function(){
 			if(download.urlReq.readyState == 4) 
